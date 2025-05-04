@@ -15,6 +15,8 @@
 
 ## **Notes**
 
+### Application discovery
+
 **Application Discovery** is the technique of identifying information from a target application, such as its URLs, input parameters, response codes, etc. It is part of the reconnaissance phase and helps uncover vulnerabilities such as XSS or SQL Injection.
 
 Application discovery can be broken down into three main phases:
@@ -23,137 +25,118 @@ Application discovery can be broken down into three main phases:
 2. **Parameter discovery**
 3. **Content discovery**
 
+Additional complementary techniques often include:
+
+- **Fuzzing**
+- **Port Scanning**
+
 ### **URL Discovery**
 
-- **Definition**: The process of discovering URLs associated with the application.
-- **Goal**: Understand the app's structure and expose internal service URLs.
-- **Tools**: GaU
-    - Example using GaU:
-    
-    ```bash
-    echo 'www.nubank.com.br' | gau
-    ```
-    
-    - **Result**:
-        - URLs are collected from passive queries to public sources and may include login pages, internal routes, etc.
-        - **Output**:
-        
-        ```bash
-        <http://www.nubank.com.br:80/>
-        <https://nubank.com.br/%22/%3E%3C/head%3E%3C/html%3E>
-        <http://www.nubank.com.br/$527,600,00>
-        <http://www.nubank.com.br/$527,600,000>
-        <https://www.nubank.com.br/$527,600,000180328>
-        [...]
-        ```
-        
+URL discovery focuses on identifying all endpoints exposed by the target application. Tools like gau or waybackurls collect these URLs from public sources such as the Wayback Machine, Common Crawl, or URL indexing services.
+
+Example using GaU:
+
+```bash
+echo '10.10.10.1' | gau
+```
+
+The collected URLs may include login pages, administrative routes, or deprecated paths, which can reveal interesting targets for further analysis.
+
+Output:
+
+```bash
+<http://10.10.10.1:80/>
+<https://10.10.10.1/%22/%3E%3C/head%3E%3C/html%3E>
+<http://10.10.10.1/$527,600,00>
+<http://10.10.10.1/$527,600,000>
+<https://10.10.10.1/$527,600,000180328>
+[...]
+```
 
 ### **Parameter Discovery**
 
-- **Definition**: Identifying parameters associated with application URLs.
-- **Goal**: Enumerate parameters to detect vulnerable ones like XSS or SQLi.
-- **Tools**: ParamSpider, KXSS
-    - Example using ParamSpider:
-    
-    ```bash
-    paramspider -d "nubank.com.br"
-    ```
-    
-    - **Result**:
-        - Parameters are extracted from public sources and might include reflected or unfiltered values.
-        - **Output**:
-        
-        ```bash
-        [INFO] Fetching URLs for nubank.com.br
-        [INFO] Found 46552 URLs for nubank.com.br
-        [...]
-        <https://www.nubank.com.br/nu/conta/pix?utm_source=FUZZ&utm_medium=FUZZ>
-        [...]
-        ```
-        
+After mapping the URLs, the next step is to enumerate query parameters that may be associated with them. These parameters can serve as entry points for attacks like XSS or SQLi, especially when the application reflects or processes the input insecurely. Tools like ParamSpider and KXSS help automate this enumeration. 
+
+Example using ParamSpider:
+
+```bash
+paramspider -d "10.10.10.1"
+```
+
+This kind of passive scraping often reveals dozens of parameters passed via GET requests, many of which can be further fuzzed or tested for input-based vulnerabilities.
+
+Output:
+
+```bash
+[INFO] Fetching URLs for 10.10.10.1
+[INFO] Found 46552 URLs for 10.10.10.1
+[...]
+<https://www.10.10.10.1/conta/pix?utm_source=FUZZ&utm_medium=FUZZ>
+[...]
+```
 
 ### **Content Discovery**
 
-- **Definition**: Understanding the behavior of an application by analyzing response status codes, server info, etc.
-- **Goal**: Identify behaviors and vulnerabilities in the app environment or file structure.
-- **Tools**: HTTPX, Aquatone
-    - Example using HTTPX:
-    
-    ```bash
-    cat urls.txt | httpx -sc -title -server -ip -probe -silent
-    ```
-    
-    - **Result**:
-        - Each URL is probed and response data is collected.
-        - **Output**:
-        
-        ```bash
-        <https://nubank.com.br/_next/static/>... [SUCCESS] [404] [Error Page | Nubank] [istio-envoy] [IP]
-        [...]
-        ```
-        
+In content discovery, the goal is to analyze how the application responds to various probes — including which status codes it returns, what server technology it uses, and what page titles or metadata are exposed. You can automate this using tools like httpx.
 
-In addition to these phases, application discovery often includes two other techniques:
+Example using httpx:
 
-1. **Fuzzing**
-2. **Port Scanning**
+```bash
+cat urls.txt | httpx -sc -title -server -ip -probe -silent
+```
+
+This phase can help identify resources that return 403 or 404 codes, but still reveal important backend infrastructure details, headers, or patterns in error responses.
+
+Output:
+
+```bash
+<https://10.10.10.1/_next/static/>... [SUCCESS] [404] [Error Page | Nubank] [istio-envoy] [IP]
+[...]
+```
 
 ### **Fuzzing**
 
-- **Definition**: Automated process for testing directory, file, or parameter names.
-- **Goal**: Discover unmapped resources via brute force.
-- **Tools**: Wfuzz, Fuff
-    - Example using Wfuzz:
-    
-    ```bash
-    wfuzz -c -z file,fuzzing-wordlist.txt <https://blog.nubank.com.br/FUZZ>
-    ```
-    
-    - **Result**:
-        - Each wordlist entry is tested to see if it resolves to a real resource.
-        - **Output**:
-        
-        ```bash
-        Target: <https://blog.nubank.com.br/FUZZ>
-        [...]
-        000000006: 403 "api/.env"
-        000000013: 301 "wp-admin"
-        [...]
-        ```
-        
+Fuzzing is often used as a complementary technique to brute-force hidden files, directories, or parameter values. By supplying a wordlist, tools like wfuzz, ffuf, or dirsearch attempt to find valid paths that are not directly linked in the application. 
+
+Example using Wfuzz:
+
+```bash
+wfuzz -c -z file,fuzzing-wordlist.txt <https://blog.10.10.10.1/FUZZ>
+```
+
+If the server responds with anything other than a 404, it may indicate a valid (but hidden) resource.
+
+Output:
+
+```bash
+Target: <https://blog.10.10.10.1/FUZZ>
+[...]
+000000006: 403 "api/.env"
+000000013: 301 "wp-admin"
+[...]
+```
 
 ### **Port Scanning**
 
-- **Definition**: Identifying open or closed ports on a server.
-- **Goal**: Reveal active services and potential targets.
-- **Tools**: Nmap
-    - Example using Nmap:
-    
-    ```bash
-    sudo nmap nubank.com.br -sV
-    ```
-    
-    - **Result**:
-        - Lists open ports and service versions (depending on flags used).
-        - **Output**:
-        
-        ```bash
-        PORT    STATE SERVICE  VERSION
-        80/tcp  open  http     Amazon CloudFront httpd
-        443/tcp open  ssl/http Amazon CloudFront httpd
-        [...]
-        ```
-        
+At the infrastructure level, port scanning is used to identify open ports and active services running on the server. This can reveal additional web interfaces, admin panels, or exposed services that are not directly tied to the application layer. The most commonly used tool is nmap:
+
+Example using Nmap:
+
+```bash
+sudo nmap 10.10.10.1 -sV
+```
+
+The scan output shows service versions and can highlight vulnerable services like outdated web servers, SSH daemons, or exposed APIs.
+
+Output:
+
+```bash
+PORT    STATE SERVICE  VERSION
+80/tcp  open  http     Amazon CloudFront httpd
+443/tcp open  ssl/http Amazon CloudFront httpd
+[...]
+```
 
 ## **Summary**
 
-Application discovery is the process of identifying information about a web application to aid in the reconnaissance phase. It includes three core phases:
-
-- **URL Discovery** (identify endpoints)
-- **Parameter Discovery** (identify input points)
-- **Content Discovery** (analyze server behavior)
-
-It also leverages:
-
-- **Fuzzing** to brute-force hidden paths, files, or parameters
-- **Port Scanning** to map exposed services on the host
+Application discovery is a foundational technique in reconnaissance, focused on identifying and analyzing the components and behaviors of a target web application. It is characterized by the mapping of URLs, enumeration of parameters, and inspection of server responses to uncover possible entry points. Combined with techniques like fuzzing and port scanning, it enables attackers or testers to develop a complete picture of the application’s attack surface, increasing the chances of identifying critical vulnerabilities early in an assessment.
