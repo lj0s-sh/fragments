@@ -1,13 +1,26 @@
 # ljós-fragments
 
-> When the walls are caving in my head
+> _When the walls are caving in my head_  
+> _When the dream controls my attitude_
 
 This is a collection of artifacts from my journey through offensive security.  
 Inside you'll find:
 
-- 📄 Articles — deeper explorations into security topics  
-- 📓 Notes — technical findings, patterns, breakdowns  
-- 🪶 Essays — raw reflections on smaller topics
+- 📄 **Articles** — deeper explorations into security concepts  
+- 📓 **Notes** — technical findings and scattered knowledge  
+- 🪶 **Essays** — raw reflections on smaller topics 
+- 🛠️ **Tools** — scripts, exploits, utilities built along the way  
+- 🗺️ **Write-ups** — walkthroughs from labs, CTFs, and real-world findings  
+- 📑 **Journal** — fragments from my learning process, daily struggles, and progress
 
 Each file is a trace — not a polished endpoint.  
 This repository is not a manual. It’s a breadcrumb trail.
+
+---
+
+This repository exists primarily for personal use.  
+It is public because I believe that fragments, when shared,  
+can become light for others walking similar paths.  
+
+If something here breaks, is wrong, or is incomplete — that’s expected.  
+It simply means the journey isn’t over yet.
