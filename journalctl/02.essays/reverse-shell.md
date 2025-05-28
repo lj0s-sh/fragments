@@ -181,7 +181,7 @@ This forces the shell to spawn inside a pseudo-terminal, improving interactivity
 Fixing the local terminal:
 
 ```bash
-Ctrl + Zfg
+Ctrl + Z
 stty raw -echo
 fg
 ```
