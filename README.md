@@ -5,13 +5,10 @@
 
 This is a collection of artifacts from my journey through offensive security.  
 Inside you'll find:
-
-- 📄 **Articles** — deeper explorations into security concepts  
-- 📓 **Notes** — technical findings and scattered knowledge  
+ 
 - 🪶 **Essays** — raw reflections on smaller topics 
-- 🛠️ **Tools** — scripts, exploits, utilities built along the way  
-- 🗺️ **Write-ups** — walkthroughs from labs, CTFs, and real-world findings  
-- 📑 **Journal** — fragments from my learning process, daily struggles, and progress
+- 📓 **Notes** — technical findings and scattered knowledge  
+- 📑 **Logs** — fragments from my learning process, daily struggles, and progress
 
 Each file is a trace — not a polished endpoint.  
 This repository is not a manual. It’s a breadcrumb trail.
