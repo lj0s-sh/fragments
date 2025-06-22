@@ -1,4 +1,4 @@
-# ljós-fragments
+# fragments
 
 > _When the walls are caving in my head_  
 > _When the dream controls my attitude_
